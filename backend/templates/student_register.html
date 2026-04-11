@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Register - School Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .class-section {
+            margin-bottom: 2rem;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .subject-tag {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            margin: 0.1rem;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-lg flex flex-col">
+            <div class="p-6 border-b border-indigo-500">
+                <h1 class="text-2xl font-bold">School MS</h1>
+                <p class="text-indigo-200 text-sm">Administration</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="/dashboard/admin" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Dashboard</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Students</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Users</a>
+                <a href="#" class="block px-4 py-2 rounded-lg bg-indigo-500 rounded-lg transition">Student Register</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Announcements</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Scores</a>
+            </nav>
+            <div class="p-4 border-t border-indigo-500">
+                <button onclick="logout()" class="w-full px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition">Logout</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <div class="bg-white shadow-sm p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Student Register</h2>
+                        <p class="text-gray-600 mt-1">View all students and their complete information</p>
+                    </div>
+                    <div id="stats" class="text-right">
+                        <p class="text-2xl font-bold text-indigo-600" id="totalStudents">0</p>
+                        <p class="text-gray-600">Total Students</p>
+                    </div>
+                </div>
+                
+                <!-- Filter Section -->
+                <div class="flex gap-4 items-end">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Class</label>
+                        <select id="classFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">All Classes</option>
+                        </select>
+                    </div>
+                    <button id="clearFilterBtn" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Clear Filter</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-6">
+                <div id="registerContent">
+                    <div class="flex justify-center items-center h-40">
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                            <p class="text-gray-600 mt-4">Loading student register...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/admin';
+        const token = localStorage.getItem('token');
+        let allData = null; // Store the full data for filtering
+
+        if (!token) {
+            window.location.href = '/login';
+        }
+
+        async function loadStudentRegister(filterClass = null) {
+            try {
+                let url = `${API_BASE}/student-register`;
+                if (filterClass) {
+                    url += `?grade_level=${encodeURIComponent(filterClass)}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`Failed to load student register (${response.status})`);
+                }
+
+                const data = await response.json();
+                allData = data;
+                displayStudentRegister(data);
+                populateClassFilter(data);
+            } catch (error) {
+                console.error('Error loading student register:', error);
+                document.getElementById('registerContent').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                        Error loading student register: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function populateClassFilter(data) {
+            const filterSelect = document.getElementById('classFilter');
+            const classes = data.available_classes || [];
+            
+            // Clear existing options except the first one
+            while (filterSelect.options.length > 1) {
+                filterSelect.remove(1);
+            }
+            
+            // Add class options
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                option.textContent = cls;
+                filterSelect.appendChild(option);
+            });
+
+            // Set current filter if provided
+            if (data.filtered_by_class) {
+                filterSelect.value = data.filtered_by_class;
+            }
+        }
+
+        function displayStudentRegister(data) {
+            const classes = data.classes || {};
+            const classNames = Object.keys(classes).sort();
+            
+            let html = '';
+
+            if (classNames.length === 0) {
+                html = '<div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center text-gray-600">No students found</div>';
+            } else {
+                for (const className of classNames) {
+                    const students = classes[className];
+                    html += `
+                        <div class="class-section">
+                            <div class="mb-4">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-2">Class: ${className}</h3>
+                                <p class="text-gray-600">${students.length} student(s)</p>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow overflow-hidden">
+                                <div class="table-container">
+                                    <table class="w-full text-sm">
+                                        <thead class="bg-indigo-50 border-b border-gray-200">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Student ID</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Name</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Class</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">DOB</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Age</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Email</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Enrollment Date</th>
+                                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Subjects</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                    `;
+
+                    for (const student of students) {
+                        const subjectCount = student.subject_count || 0;
+                        const subjectHtml = student.subjects.length > 0 
+                            ? student.subjects.map(s => `<span class="subject-tag">${s}</span>`).join('')
+                            : '<span class="text-gray-400 italic">No subjects</span>';
+
+                        const dobDate = new Date(student.date_of_birth);
+                        const dobFormatted = dobDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        const enrollmentDate = new Date(student.enrollment_date);
+                        const enrollmentFormatted = enrollmentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+                        html += `
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="px-4 py-3 font-medium text-gray-900">${student.student_id}</td>
+                                <td class="px-4 py-3 text-gray-900">${student.student_name}</td>
+                                <td class="px-4 py-3">
+                                    <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">${student.grade_level}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">${dobFormatted}</td>
+                                <td class="px-4 py-3 text-gray-700">${student.age} years</td>
+                                <td class="px-4 py-3 text-gray-600">${student.email}</td>
+                                <td class="px-4 py-3 text-gray-700">${enrollmentFormatted}</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap gap-1">
+                                        ${subjectHtml}
+                                    </div>
+                                    <div class="text-gray-500 text-xs mt-1">${subjectCount}/15 subjects</div>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    html += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('totalStudents').textContent = data.total_students || 0;
+            document.getElementById('registerContent').innerHTML = html;
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        // Event listeners
+        document.getElementById('classFilter').addEventListener('change', (e) => {
+            loadStudentRegister(e.target.value || null);
+        });
+
+        document.getElementById('clearFilterBtn').addEventListener('click', () => {
+            document.getElementById('classFilter').value = '';
+            loadStudentRegister(null);
+        });
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudentRegister();
+        });
+    </script>
+</body>
+</html>

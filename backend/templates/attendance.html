@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management - School Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .status-present { background-color: #d1fae5; color: #065f46; }
+        .status-absent { background-color: #fee2e2; color: #991b1b; }
+        .status-late { background-color: #fef3c7; color: #92400e; }
+        .status-excused { background-color: #e0e7ff; color: #3730a3; }
+        .attendance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .student-card { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-lg flex flex-col">
+            <div class="p-6 border-b border-indigo-500">
+                <h1 class="text-2xl font-bold">School MS</h1>
+                <p class="text-indigo-200 text-sm">Administration</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="/dashboard/admin" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Dashboard</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Students</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Users</a>
+                <a href="/student-register" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Student Register</a>
+                <a href="#" class="block px-4 py-2 rounded-lg bg-indigo-500 rounded-lg transition">Attendance</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Announcements</a>
+                <a href="#" class="block px-4 py-2 rounded-lg hover:bg-indigo-500 transition">Scores</a>
+            </nav>
+            <div class="p-4 border-t border-indigo-500">
+                <button onclick="logout()" class="w-full px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition">Logout</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <div class="bg-white shadow-sm p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Attendance Management</h2>
+                        <p class="text-gray-600 mt-1">Track and manage student attendance</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button id="markAttendanceBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            Mark Attendance
+                        </button>
+                        <button id="viewReportsBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            Weekly Reports
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h3 class="text-sm font-medium text-gray-500">Today's Attendance</h3>
+                        <p class="text-2xl font-bold text-indigo-600" id="todayAttendance">-</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h3 class="text-sm font-medium text-gray-500">This Week</h3>
+                        <p class="text-2xl font-bold text-green-600" id="weekAttendance">-</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h3 class="text-sm font-medium text-gray-500">Low Attendance</h3>
+                        <p class="text-2xl font-bold text-red-600" id="lowAttendance">-</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h3 class="text-sm font-medium text-gray-500">Perfect Attendance</h3>
+                        <p class="text-2xl font-bold text-blue-600" id="perfectAttendance">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-6">
+                <div id="contentArea">
+                    <div class="flex justify-center items-center h-40">
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                            <p class="text-gray-600 mt-4">Loading attendance data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mark Attendance Modal -->
+    <div id="attendanceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl font-semibold text-primary mb-4">Mark Attendance</h3>
+                <form id="attendanceForm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                            <select id="attendanceClass" name="class" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <option value="">Select Class</option>
+                                <option value="JSS1">JSS1</option>
+                                <option value="JSS2">JSS2</option>
+                                <option value="JSS3">JSS3</option>
+                                <option value="SS1">SS1</option>
+                                <option value="SS2">SS2</option>
+                                <option value="SS3">SS3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                            <select id="attendanceSubject" name="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                            <input type="date" id="attendanceDate" name="date" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div id="studentsList" class="attendance-grid">
+                        <!-- Students will be loaded here -->
+                    </div>
+
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" id="cancelAttendanceBtn" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save Attendance</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Reports Modal -->
+    <div id="reportsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-6xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl font-semibold text-primary mb-4">Weekly Attendance Reports</h3>
+                <form id="reportsForm" class="mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Week Starting</label>
+                            <input type="date" id="reportWeekStart" name="weekStart" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Class (Optional)</label>
+                            <select id="reportClass" name="class" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <option value="">All Classes</option>
+                                <option value="JSS1">JSS1</option>
+                                <option value="JSS2">JSS2</option>
+                                <option value="JSS3">JSS3</option>
+                                <option value="SS1">SS1</option>
+                                <option value="SS2">SS2</option>
+                                <option value="SS3">SS3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Generate Report</button>
+                </form>
+
+                <div id="reportsContent">
+                    <!-- Reports will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/admin';
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = '/login';
+        }
+
+        // Nigerian subjects for the dropdown
+        const nigerianSubjects = [
+            "English Language", "Mathematics", "Biology", "Chemistry", "Physics",
+            "History", "Geography", "Civic Education", "Literature in English",
+            "Computer Science", "Agricultural Science", "Trade/Vocational Studies",
+            "Physical Education", "Music", "Visual Arts"
+        ];
+
+        async function loadDashboardStats() {
+            try {
+                // Get today's date
+                const today = new Date().toISOString().split('T')[0];
+
+                // Get this week's start (Monday)
+                const todayDate = new Date();
+                const monday = new Date(todayDate);
+                monday.setDate(todayDate.getDate() - todayDate.getDay() + 1);
+                const weekStart = monday.toISOString().split('T')[0];
+
+                // Load weekly report for stats
+                const response = await fetch(`${API_BASE}/attendance/reports/weekly?week_start=${weekStart}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStats(data);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function updateStats(data) {
+            const reports = data.reports || [];
+            const summary = data.summary || {};
+
+            document.getElementById('todayAttendance').textContent = '-';
+            document.getElementById('weekAttendance').textContent = `${summary.average_attendance || 0}%`;
+            document.getElementById('lowAttendance').textContent = summary.students_with_low_attendance || 0;
+            document.getElementById('perfectAttendance').textContent = summary.perfect_attendance || 0;
+        }
+
+        function showAttendanceModal() {
+            document.getElementById('attendanceModal').classList.remove('hidden');
+            populateSubjects();
+            setDefaultDate();
+        }
+
+        function populateSubjects() {
+            const subjectSelect = document.getElementById('attendanceSubject');
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            nigerianSubjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('attendanceDate').value = today;
+        }
+
+        async function loadStudentsForAttendance() {
+            const className = document.getElementById('attendanceClass').value;
+            const subject = document.getElementById('attendanceSubject').value;
+            const date = document.getElementById('attendanceDate').value;
+
+            if (!className || !subject || !date) {
+                document.getElementById('studentsList').innerHTML = '<p class="text-gray-500 col-span-full">Please select class, subject, and date</p>';
+                return;
+            }
+
+            try {
+                // Get students in the class
+                const response = await fetch(`${API_BASE}/students/?grade_level=${encodeURIComponent(className)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load students');
+
+                const students = await response.json();
+                displayStudentsForAttendance(students, subject, date);
+            } catch (error) {
+                console.error('Error loading students:', error);
+                document.getElementById('studentsList').innerHTML = `<p class="text-red-500 col-span-full">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayStudentsForAttendance(students, subject, date) {
+            const container = document.getElementById('studentsList');
+
+            if (students.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full">No students found in this class</p>';
+                return;
+            }
+
+            container.innerHTML = students.map(student => `
+                <div class="student-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-medium text-gray-900">${student.user?.full_name || 'Unknown'}</h4>
+                        <span class="text-sm text-gray-500">ID: ${student.student_id}</span>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="attendance_${student.id}" value="present" checked class="h-4 w-4 text-green-600 focus:ring-green-500">
+                            <span class="ml-2 text-sm text-green-700">Present</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="attendance_${student.id}" value="absent" class="h-4 w-4 text-red-600 focus:ring-red-500">
+                            <span class="ml-2 text-sm text-red-700">Absent</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="attendance_${student.id}" value="late" class="h-4 w-4 text-yellow-600 focus:ring-yellow-500">
+                            <span class="ml-2 text-sm text-yellow-700">Late</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="attendance_${student.id}" value="excused" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-blue-700">Excused</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function submitAttendance() {
+            const className = document.getElementById('attendanceClass').value;
+            const subject = document.getElementById('attendanceSubject').value;
+            const date = document.getElementById('attendanceDate').value;
+
+            // Collect attendance data
+            const attendanceRecords = {};
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+
+            radios.forEach(radio => {
+                const studentId = radio.name.replace('attendance_', '');
+                attendanceRecords[parseInt(studentId)] = radio.value;
+            });
+
+            try {
+                const response = await fetch(`${API_BASE}/attendance/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        class_name: className,
+                        subject: subject,
+                        attendance_date: date,
+                        attendance_records: attendanceRecords
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to save attendance');
+
+                const result = await response.json();
+                alert(`Attendance saved! Created: ${result.created.length}, Skipped: ${result.skipped.length}`);
+
+                document.getElementById('attendanceModal').classList.add('hidden');
+                loadDashboardStats();
+            } catch (error) {
+                console.error('Error saving attendance:', error);
+                alert(`Error saving attendance: ${error.message}`);
+            }
+        }
+
+        function showReportsModal() {
+            document.getElementById('reportsModal').classList.remove('hidden');
+            setDefaultWeekStart();
+        }
+
+        function setDefaultWeekStart() {
+            const today = new Date();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - today.getDay() + 1);
+            const weekStart = monday.toISOString().split('T')[0];
+            document.getElementById('reportWeekStart').value = weekStart;
+        }
+
+        async function generateReport() {
+            const weekStart = document.getElementById('reportWeekStart').value;
+            const className = document.getElementById('reportClass').value;
+
+            if (!weekStart) {
+                alert('Please select a week start date');
+                return;
+            }
+
+            try {
+                let url = `${API_BASE}/attendance/reports/weekly?week_start=${weekStart}`;
+                if (className) {
+                    url += `&class_name=${encodeURIComponent(className)}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to generate report');
+
+                const data = await response.json();
+                displayReport(data);
+            } catch (error) {
+                console.error('Error generating report:', error);
+                document.getElementById('reportsContent').innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayReport(data) {
+            const container = document.getElementById('reportsContent');
+            const reports = data.reports || [];
+
+            if (reports.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No attendance data found for this period</p>';
+                return;
+            }
+
+            const summary = data.summary || {};
+
+            let html = `
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Week Summary</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>Average Attendance: <span class="font-bold text-blue-600">${summary.average_attendance}%</span></div>
+                        <div>Low Attendance (<80%): <span class="font-bold text-red-600">${summary.students_with_low_attendance}</span></div>
+                        <div>Perfect Attendance: <span class="font-bold text-green-600">${summary.perfect_attendance}</span></div>
+                        <div>Total Students: <span class="font-bold">${data.total_students}</span></div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Student</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Class</th>
+                                <th class="px-4 py-3 text-center font-semibold text-gray-700">Total Days</th>
+                                <th class="px-4 py-3 text-center font-semibold text-gray-700">Present</th>
+                                <th class="px-4 py-3 text-center font-semibold text-gray-700">Absent</th>
+                                <th class="px-4 py-3 text-center font-semibold text-gray-700">Late</th>
+                                <th class="px-4 py-3 text-center font-semibold text-gray-700">Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            reports.forEach(report => {
+                const percentageClass = report.attendance_percentage >= 90 ? 'text-green-600' :
+                                      report.attendance_percentage >= 80 ? 'text-yellow-600' : 'text-red-600';
+
+                html += `
+                    <tr class="border-t border-gray-200">
+                        <td class="px-4 py-3 font-medium">${report.student_name}</td>
+                        <td class="px-4 py-3">${report.grade_level}</td>
+                        <td class="px-4 py-3 text-center">${report.total_days}</td>
+                        <td class="px-4 py-3 text-center text-green-600">${report.present_days}</td>
+                        <td class="px-4 py-3 text-center text-red-600">${report.absent_days}</td>
+                        <td class="px-4 py-3 text-center text-yellow-600">${report.late_days}</td>
+                        <td class="px-4 py-3 text-center font-bold ${percentageClass}">${report.attendance_percentage}%</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        // Event listeners
+        document.getElementById('markAttendanceBtn').addEventListener('click', showAttendanceModal);
+        document.getElementById('viewReportsBtn').addEventListener('click', showReportsModal);
+
+        document.getElementById('cancelAttendanceBtn').addEventListener('click', () => {
+            document.getElementById('attendanceModal').classList.add('hidden');
+        });
+
+        document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitAttendance();
+        });
+
+        // Load students when class/subject/date changes
+        document.getElementById('attendanceClass').addEventListener('change', loadStudentsForAttendance);
+        document.getElementById('attendanceSubject').addEventListener('change', loadStudentsForAttendance);
+        document.getElementById('attendanceDate').addEventListener('change', loadStudentsForAttendance);
+
+        document.getElementById('reportsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await generateReport();
+        });
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+        });
+    </script>
+</body>
+</html>

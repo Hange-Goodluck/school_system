@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bright Brains Christian Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E2A38',
+                        secondary: '#2F80C0',
+                        accent: '#C0392B',
+                        gold: '#D4AF37',
+                        bgLight: '#F8FAFC',
+                        card: '#FFFFFF',
+                        border: '#E5E7EB',
+                        textPrimary: '#111827',
+                        textSecondary: '#6B7280',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-bgLight text-textPrimary min-h-screen">
+    <header class="relative overflow-hidden shadow-xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-gold opacity-95"></div>
+        <div class="relative container mx-auto px-6 py-5 flex items-center justify-between text-white">
+            <div>
+                <p class="text-sm uppercase tracking-[0.3em] text-white/80">Admin Control Center</p>
+                <h1 class="text-2xl md:text-3xl font-bold">School Management Dashboard</h1>
+            </div>
+            <button id="logoutBtn" class="px-4 py-2 rounded-lg bg-white/15 border border-white/30 hover:bg-white/25 transition">Logout</button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <div class="grid lg:grid-cols-[280px_minmax(0,1fr)] gap-6 items-start">
+            <aside class="bg-primary text-white rounded-2xl shadow-xl overflow-hidden sticky top-6">
+                <div class="bg-gradient-to-br from-primary via-secondary to-gold p-5">
+                    <p class="text-xs uppercase tracking-[0.3em] text-white/80">Admin Panel</p>
+                    <h2 class="text-xl font-bold mt-2">Control Navigation</h2>
+                    <p class="text-sm text-white/90 mt-1">Manage the school system from one place.</p>
+                </div>
+
+                <div class="p-4 space-y-2">
+                    <a href="/dashboard/admin" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition font-medium">
+                        <span>🏠</span>
+                        <span>Overview</span>
+                    </a>
+                    <a href="#students-section" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>🎓</span>
+                        <span>Students</span>
+                    </a>
+                    <a href="/student-register" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>📋</span>
+                        <span>Student Register</span>
+                    </a>
+                    <a href="/attendance" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>📅</span>
+                        <span>Attendance</span>
+                    </a>
+                    <a href="#scores-section" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>📊</span>
+                        <span>Scores</span>
+                    </a>
+                    <a href="#announcements-section" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>📢</span>
+                        <span>Announcements</span>
+                    </a>
+                    <a href="#notes-section" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>📝</span>
+                        <span>Admin Notes</span>
+                    </a>
+                    <a href="/dashboard/student" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                        <span>👨‍🎓</span>
+                        <span>Student View</span>
+                    </a>
+                </div>
+
+                <div class="px-4 pb-4">
+                    <div class="rounded-xl bg-white/10 border border-white/10 p-4">
+                        <p class="text-xs uppercase tracking-wider text-gold">System status</p>
+                        <p class="mt-2 text-lg font-semibold">Operational</p>
+                        <p class="text-sm text-white/80 mt-1">All dashboard modules are available.</p>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="space-y-8">
+                <section id="students-section" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-secondary">
+                <p class="text-sm text-gray-500">Students</p>
+                <h2 class="text-3xl font-bold text-primary mt-2" id="studentCount">{{ student_count }}</h2>
+                <p class="mt-2 text-gray-600">Registered learner profiles</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-gold">
+                <p class="text-sm text-gray-500">Teachers</p>
+                <h2 class="text-3xl font-bold text-primary mt-2" id="teacherCount">{{ teacher_count }}</h2>
+                <p class="mt-2 text-gray-600">Active teaching staff</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-accent">
+                <p class="text-sm text-gray-500">Announcements</p>
+                <h2 class="text-3xl font-bold text-primary mt-2" id="announcementCount">{{ announcement_count }}</h2>
+                <p class="mt-2 text-gray-600">Published notices</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-primary">
+                <p class="text-sm text-gray-500">Status</p>
+                <h2 class="text-3xl font-bold text-primary mt-2">Online</h2>
+                <p class="mt-2 text-gray-600">Monitoring active school data</p>
+            </div>
+        </section>
+
+        <section class="grid lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-primary">Administrator Summary</h3>
+                    <span class="px-3 py-1 text-sm rounded-full bg-gold/20 text-primary font-medium">Management View</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Full Name</p>
+                        <p class="font-semibold text-primary mt-1" id="adminName">Loading...</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Email</p>
+                        <p class="font-semibold text-primary mt-1" id="adminEmail">Loading...</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Access Level</p>
+                        <p class="font-semibold text-primary mt-1">Administrator</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Today’s Focus</p>
+                        <p class="font-semibold text-primary mt-1">Operations & communication</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4">Quick Actions</h3>
+                <div class="space-y-3">
+                    <button class="w-full text-left px-4 py-3 rounded-xl bg-secondary text-white hover:bg-blue-700 transition">Manage Students</button>
+                    <button class="w-full text-left px-4 py-3 rounded-xl bg-primary text-white hover:opacity-90 transition">Manage Teachers</button>
+                    <button class="w-full text-left px-4 py-3 rounded-xl bg-accent text-white hover:bg-red-700 transition">Create Announcement</button>
+                    <button class="w-full text-left px-4 py-3 rounded-xl bg-gold text-primary font-semibold hover:bg-yellow-400 transition">View Reports</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4">Recent Announcements</h3>
+                <div id="announcementList" class="space-y-3 text-gray-700">
+                    <p class="text-gray-500">Loading announcements...</p>
+                </div>
+            </div>
+        </section>
+
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-primary">User Management</h3>
+                <button id="addUserBtn" class="px-4 py-2 rounded-lg bg-secondary text-white hover:bg-blue-700 transition">Add New User</button>
+            </div>
+            <div id="usersList" class="space-y-4">
+                <p class="text-gray-500">Loading users...</p>
+            </div>
+        </section>
+
+        <section id="students-management-section" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-primary">Student Management</h3>
+                <button id="addStudentBtn" class="px-4 py-2 rounded-lg bg-secondary text-white hover:bg-blue-700 transition">Add New Student</button>
+            </div>
+            <div id="studentsList" class="space-y-4">
+                <p class="text-gray-500">Loading students...</p>
+            </div>
+        </section>
+
+        <section id="announcements-management-section" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-primary">Announcement Management</h3>
+                <button id="addAnnouncementBtn" class="px-4 py-2 rounded-lg bg-accent text-white hover:bg-red-700 transition">Create Announcement</button>
+            </div>
+            <div id="announcementsList" class="space-y-4">
+                <p class="text-gray-500">Loading announcements...</p>
+            </div>
+        </section>
+
+        <section id="scores-section" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-primary">Student Scores</h3>
+                <button id="addScoreBtn" class="px-4 py-2 rounded-lg bg-secondary text-white hover:bg-blue-700 transition">Add Score</button>
+            </div>
+            <div id="scoresList" class="overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                    <thead class="bg-lightbg">
+                        <tr>
+                            <th class="px-4 py-3">Student</th>
+                            <th class="px-4 py-3">Student ID</th>
+                            <th class="px-4 py-3">Subject</th>
+                            <th class="px-4 py-3">Score</th>
+                            <th class="px-4 py-3">Term</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoresTableBody" class="divide-y divide-slate-200 text-gray-700">
+                        <tr><td class="px-4 py-4" colspan="5">Loading scores...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="subjects-section" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-primary">Subject Management</h3>
+                <button id="bulkAssignBtn" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Bulk Assign Subjects</button>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="font-medium text-blue-800 mb-2">Quick Actions</h4>
+                <div class="flex gap-4">
+                    <button onclick="seedAllSubjects()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
+                        Seed All Students with 15 Subjects
+                    </button>
+                    <a href="/student-register" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                        View Student Register
+                    </a>
+                </div>
+                <p class="text-sm text-blue-600 mt-2">
+                    Use "Seed All Students" to automatically enroll all students in the 15 core Nigerian subjects.
+                    Use "Bulk Assign" to selectively assign subjects to specific classes.
+                </p>
+            </div>
+        </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- User Modal -->
+    <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4" id="userModalTitle">Add New User</h3>
+                <form id="userForm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                            <select id="role" name="role" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" id="cancelUserBtn" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-blue-700 transition">Create User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="studentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4" id="studentModalTitle">Add New Student</h3>
+                <form id="studentForm">
+                    <input type="hidden" id="studentId" name="studentId">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                            <input type="number" id="userId" name="userId" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                            <input type="text" id="studentIdInput" name="studentIdInput" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Grade Level</label>
+                            <input type="text" id="gradeLevel" name="gradeLevel" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Enrollment Date</label>
+                            <input type="date" id="enrollmentDate" name="enrollmentDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" id="cancelStudentBtn" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-blue-700 transition">Save Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div id="announcementModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4" id="announcementModalTitle">Create Announcement</h3>
+                <form id="announcementForm">
+                    <input type="hidden" id="announcementId" name="announcementId">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input type="text" id="announcementTitle" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                            <textarea id="announcementContent" name="content" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"></textarea>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="isPublished" name="isPublished" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                            <label for="isPublished" class="ml-2 block text-sm text-gray-700">Publish immediately</label>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" id="cancelAnnouncementBtn" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-accent text-white rounded-lg hover:bg-red-700 transition">Save Announcement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Modal -->
+    <div id="scoreModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4">Add Student Score</h3>
+                <form id="scoreForm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                            <input type="number" id="scoreStudentId" name="studentId" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <input type="text" id="scoreSubject" name="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Score</label>
+                            <input type="number" step="0.1" id="scoreValue" name="score" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Term</label>
+                            <input type="text" id="scoreTerm" name="term" placeholder="2026" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" id="cancelScoreBtn" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-blue-700 transition">Save Score</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Assign Subjects Modal -->
+    <div id="bulkAssignModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4">Bulk Assign Subjects</h3>
+                <form id="bulkAssignForm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Class</label>
+                            <select id="bulkAssignClass" name="class" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent">
+                                <option value="">Choose a class...</option>
+                                <option value="JSS1">JSS1</option>
+                                <option value="JSS2">JSS2</option>
+                                <option value="JSS3">JSS3</option>
+                                <option value="SS1">SS1</option>
+                                <option value="SS2">SS2</option>
+                                <option value="SS3">SS3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Subjects to Assign</label>
+                            <div class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border border-gray-300 rounded-lg p-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="English Language" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">English Language</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Mathematics" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Mathematics</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Biology" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Biology</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Chemistry" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Chemistry</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Physics" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Physics</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="History" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">History</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Geography" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Geography</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Civic Education" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Civic Education</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Literature in English" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Literature in English</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Computer Science" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Computer Science</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Agricultural Science" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Agricultural Science</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Trade/Vocational Studies" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Trade/Vocational Studies</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Physical Education" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Physical Education</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Music" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Music</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="subjects" value="Visual Arts" class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    <span class="ml-2 text-sm">Visual Arts</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="bulkAssignStatus" class="text-sm text-gray-600"></div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" id="cancelBulkAssignBtn" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Assign Subjects</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        console.log('Token from localStorage:', token);
+        if (!token) {
+            console.log('No token found, redirecting to login');
+            window.location.href = '/login';
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        });
+
+
+
+
+
+
+
+        const userModal = document.getElementById('userModal');
+        const scoreModal = document.getElementById('scoreModal');
+
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            document.getElementById('userModalTitle').textContent = 'Add New User';
+            document.getElementById('userForm').reset();
+            userModal.classList.remove('hidden');
+        });
+
+        document.getElementById('cancelUserBtn').addEventListener('click', () => {
+            userModal.classList.add('hidden');
+        });
+
+        document.getElementById('addScoreBtn').addEventListener('click', () => {
+            document.getElementById('scoreForm').reset();
+            scoreModal.classList.remove('hidden');
+        });
+
+        document.getElementById('cancelScoreBtn').addEventListener('click', () => {
+            scoreModal.classList.add('hidden');
+        });
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            const data = {
+                full_name: formData.get('fullName'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: formData.get('role')
+            };
+
+            try {
+                const response = await fetch('/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    userModal.classList.add('hidden');
+                    loadUsers();
+                    loadScores();
+                } else {
+                    alert('Error creating user');
+                }
+            } catch (error) {
+                alert('Error creating user');
+            }
+        });
+
+        document.getElementById('scoreForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            const data = {
+                student_id: parseInt(formData.get('studentId'), 10),
+                subject: formData.get('subject'),
+                score: parseFloat(formData.get('score')),
+                term: formData.get('term') || '2026'
+            };
+
+            try {
+                const response = await fetch('/admin/scores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    scoreModal.classList.add('hidden');
+                    loadScores();
+                } else {
+                    alert('Error saving score');
+                }
+            } catch (error) {
+                alert('Error saving score');
+            }
+        });
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/admin/users', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const users = await response.json();
+                const list = document.getElementById('usersList');
+
+                if (!users.length) {
+                    list.innerHTML = '<p class="text-gray-500">No users found.</p>';
+                    return;
+                }
+
+                list.innerHTML = users.map(user => `
+                    <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-lightbg">
+                        <div>
+                            <h4 class="font-semibold text-primary">${user.full_name}</h4>
+                            <p class="text-sm text-gray-600">${user.email} | Role: ${user.role}</p>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            ID: ${user.id}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function loadScores() {
+            try {
+                const response = await fetch('/admin/scores', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const body = document.getElementById('scoresTableBody');
+                if (!response.ok) {
+                    body.innerHTML = '<tr><td class="px-4 py-4" colspan="5">Unable to load scores.</td></tr>';
+                    return;
+                }
+
+                const scores = await response.json();
+                if (!scores.length) {
+                    body.innerHTML = '<tr><td class="px-4 py-4" colspan="5">No scores recorded yet.</td></tr>';
+                    return;
+                }
+
+                body.innerHTML = scores.map(score => `
+                    <tr>
+                        <td class="px-4 py-4">${score.student_name || 'Unknown'}</td>
+                        <td class="px-4 py-4">${score.student_id}</td>
+                        <td class="px-4 py-4">${score.subject}</td>
+                        <td class="px-4 py-4">${score.score}</td>
+                        <td class="px-4 py-4">${score.term}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading scores:', error);
+                document.getElementById('scoresTableBody').innerHTML = '<tr><td class="px-4 py-4" colspan="5">Error loading scores.</td></tr>';
+            }
+        }
+
+        const announcementModal = document.getElementById('announcementModal');
+
+        document.getElementById('addStudentBtn').addEventListener('click', () => {
+            document.getElementById('studentModalTitle').textContent = 'Add New Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentId').value = '';
+            studentModal.classList.remove('hidden');
+        });
+
+        document.getElementById('addAnnouncementBtn').addEventListener('click', () => {
+            document.getElementById('announcementModalTitle').textContent = 'Create Announcement';
+            document.getElementById('announcementForm').reset();
+            document.getElementById('announcementId').value = '';
+            announcementModal.classList.remove('hidden');
+        });
+
+        document.getElementById('cancelStudentBtn').addEventListener('click', () => {
+            studentModal.classList.add('hidden');
+        });
+
+        document.getElementById('cancelAnnouncementBtn').addEventListener('click', () => {
+            announcementModal.classList.add('hidden');
+        });
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const studentId = formData.get('studentId');
+
+            const data = {
+                user_id: parseInt(formData.get('userId')),
+                student_id: formData.get('studentIdInput'),
+                grade_level: formData.get('gradeLevel'),
+                date_of_birth: formData.get('dateOfBirth'),
+                enrollment_date: formData.get('enrollmentDate') || null
+            };
+
+            try {
+                let response;
+                if (studentId) {
+                    response = await fetch(`/admin/students/${studentId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await fetch('/admin/students/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                if (response.ok) {
+                    studentModal.classList.add('hidden');
+                    loadStudents();
+                } else {
+                    alert('Error saving student');
+                }
+            } catch (error) {
+                alert('Error saving student');
+            }
+        });
+
+        document.getElementById('announcementForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const announcementId = formData.get('announcementId');
+
+            const data = {
+                title: formData.get('title'),
+                content: formData.get('content'),
+                is_published: document.getElementById('isPublished').checked
+            };
+
+            try {
+                let response;
+                if (announcementId) {
+                    response = await fetch(`/admin/announcements/${announcementId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await fetch('/admin/announcements/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                if (response.ok) {
+                    announcementModal.classList.add('hidden');
+                    loadAnnouncements();
+                } else {
+                    alert('Error saving announcement');
+                }
+            } catch (error) {
+                alert('Error saving announcement');
+            }
+        });
+
+        async function loadStudents() {
+            try {
+                const response = await fetch('/admin/students/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const students = await response.json();
+                const list = document.getElementById('studentsList');
+
+                if (!students.length) {
+                    list.innerHTML = '<p class="text-gray-500">No students found.</p>';
+                    return;
+                }
+
+                list.innerHTML = students.map(student => `
+                    <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-lightbg">
+                        <div>
+                            <h4 class="font-semibold text-primary">Student ID: ${student.student_id}</h4>
+                            <p class="text-sm text-gray-600">Grade: ${student.grade_level} | DOB: ${student.date_of_birth}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editStudent(${student.id})" class="px-3 py-1 text-sm bg-secondary text-white rounded hover:bg-blue-700 transition">Edit</button>
+                            <button onclick="deleteStudent(${student.id})" class="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-red-700 transition">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        async function loadAnnouncements() {
+            try {
+                const response = await fetch('/admin/announcements/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const announcements = await response.json();
+                const list = document.getElementById('announcementsList');
+
+                if (!announcements.length) {
+                    list.innerHTML = '<p class="text-gray-500">No announcements found.</p>';
+                    return;
+                }
+
+                list.innerHTML = announcements.map(announcement => `
+                    <div class="p-4 rounded-xl border border-slate-200 bg-lightbg">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-primary">${announcement.title}</h4>
+                            <div class="flex gap-2">
+                                <button onclick="editAnnouncement(${announcement.id})" class="px-3 py-1 text-sm bg-secondary text-white rounded hover:bg-blue-700 transition">Edit</button>
+                                <button onclick="deleteAnnouncement(${announcement.id})" class="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-red-700 transition">Delete</button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">${announcement.content}</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-500">
+                            <span>Status: ${announcement.is_published ? 'Published' : 'Draft'}</span>
+                            <span>Created: ${new Date(announcement.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+            }
+        }
+
+        async function editStudent(studentId) {
+            try {
+                const response = await fetch(`/admin/students/${studentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const student = await response.json();
+                    document.getElementById('studentModalTitle').textContent = 'Edit Student';
+                    document.getElementById('studentId').value = student.id;
+                    document.getElementById('userId').value = student.user_id;
+                    document.getElementById('studentIdInput').value = student.student_id;
+                    document.getElementById('gradeLevel').value = student.grade_level;
+                    document.getElementById('dateOfBirth').value = student.date_of_birth;
+                    document.getElementById('enrollmentDate').value = student.enrollment_date;
+                    studentModal.classList.remove('hidden');
+                }
+            } catch (error) {
+                alert('Error loading student data');
+            }
+        }
+
+        async function editAnnouncement(announcementId) {
+            try {
+                const response = await fetch(`/admin/announcements/${announcementId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const announcement = await response.json();
+                    document.getElementById('announcementModalTitle').textContent = 'Edit Announcement';
+                    document.getElementById('announcementId').value = announcement.id;
+                    document.getElementById('announcementTitle').value = announcement.title;
+                    document.getElementById('announcementContent').value = announcement.content;
+                    document.getElementById('isPublished').checked = announcement.is_published;
+                    announcementModal.classList.remove('hidden');
+                }
+            } catch (error) {
+                alert('Error loading announcement data');
+            }
+        }
+
+        async function deleteStudent(studentId) {
+            if (!confirm('Are you sure you want to delete this student?')) return;
+
+            try {
+                const response = await fetch(`/admin/students/${studentId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    loadStudents();
+                } else {
+                    alert('Error deleting student');
+                }
+            } catch (error) {
+                alert('Error deleting student');
+            }
+        }
+
+        async function deleteAnnouncement(announcementId) {
+            if (!confirm('Are you sure you want to delete this announcement?')) return;
+
+            try {
+                const response = await fetch(`/admin/announcements/${announcementId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    loadAnnouncements();
+                } else {
+                    alert('Error deleting announcement');
+                }
+            } catch (error) {
+                alert('Error deleting announcement');
+            }
+        }
+
+        const bulkAssignModal = document.getElementById('bulkAssignModal');
+
+        document.getElementById('bulkAssignBtn').addEventListener('click', () => {
+            document.getElementById('bulkAssignForm').reset();
+            document.getElementById('bulkAssignStatus').textContent = '';
+            bulkAssignModal.classList.remove('hidden');
+        });
+
+        document.getElementById('cancelBulkAssignBtn').addEventListener('click', () => {
+            bulkAssignModal.classList.add('hidden');
+        });
+
+        document.getElementById('bulkAssignForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const selectedClass = formData.get('class');
+            const selectedSubjects = formData.getAll('subjects');
+
+            if (!selectedClass) {
+                alert('Please select a class');
+                return;
+            }
+
+            if (selectedSubjects.length === 0) {
+                alert('Please select at least one subject');
+                return;
+            }
+
+            const statusDiv = document.getElementById('bulkAssignStatus');
+            statusDiv.textContent = 'Assigning subjects... Please wait.';
+            statusDiv.className = 'text-sm text-blue-600';
+
+            try {
+                // Get all students in the selected class
+                const studentsResponse = await fetch('/admin/students/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!studentsResponse.ok) {
+                    throw new Error('Failed to fetch students');
+                }
+
+                const allStudents = await studentsResponse.json();
+                const classStudents = allStudents.filter(student => student.grade_level === selectedClass);
+
+                if (classStudents.length === 0) {
+                    statusDiv.textContent = `No students found in class ${selectedClass}`;
+                    statusDiv.className = 'text-sm text-orange-600';
+                    return;
+                }
+
+                let totalAssigned = 0;
+                let totalSkipped = 0;
+
+                // Assign subjects to each student in the class
+                for (const student of classStudents) {
+                    for (const subject of selectedSubjects) {
+                        try {
+                            const response = await fetch('/admin/student-subjects/', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    student_id: student.id,
+                                    subject: subject,
+                                    status: 'enrolled'
+                                })
+                            });
+
+                            if (response.status === 400) {
+                                // Subject already assigned - skip
+                                totalSkipped++;
+                            } else if (response.ok) {
+                                totalAssigned++;
+                            } else {
+                                console.error(`Failed to assign ${subject} to student ${student.id}`);
+                            }
+                        } catch (error) {
+                            console.error(`Error assigning ${subject} to student ${student.id}:`, error);
+                        }
+                    }
+                }
+
+                statusDiv.textContent = `✅ Successfully assigned ${totalAssigned} subjects. ${totalSkipped} were already assigned.`;
+                statusDiv.className = 'text-sm text-green-600';
+
+                // Close modal after a delay
+                setTimeout(() => {
+                    bulkAssignModal.classList.add('hidden');
+                }, 2000);
+
+            } catch (error) {
+                console.error('Bulk assign error:', error);
+                statusDiv.textContent = '❌ Error during bulk assignment. Please try again.';
+                statusDiv.className = 'text-sm text-red-600';
+            }
+        });
+
+        async function seedAllSubjects() {
+            if (!confirm('This will enroll ALL students in the 15 core Nigerian subjects. Continue?')) {
+                return;
+            }
+
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Seeding...';
+            button.disabled = true;
+
+            try {
+                // This would call a backend endpoint to run the seeding script
+                // For now, we'll simulate it by making individual API calls
+                alert('Seeding functionality requires running the seed_subjects.py script from the command line.\n\nRun: python seed_subjects.py');
+                button.textContent = originalText;
+                button.disabled = false;
+
+            } catch (error) {
+                console.error('Seeding error:', error);
+                alert('Error during seeding. Check console for details.');
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        async function loadAdminDashboard() {
+            console.log('Starting loadAdminDashboard');
+            try {
+                console.log('Fetching /users/me with token:', token);
+                const userRes = await fetch('/users/me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                console.log('User response status:', userRes.status);
+                console.log('User response ok:', userRes.ok);
+                if (!userRes.ok) {
+                    console.log('User response not ok, throwing error');
+                    throw new Error('Unauthorized');
+                }
+                const user = await userRes.json();
+                console.log('User data:', user);
+
+                if (user.role !== 'admin') {
+                    console.log('User role is not admin, redirecting to student dashboard');
+                    window.location.href = '/dashboard/student';
+                    return;
+                }
+
+                console.log('User is admin, loading dashboard data');
+                document.getElementById('adminName').textContent = user.full_name;
+                document.getElementById('adminEmail').textContent = user.email;
+
+                // Load announcement summary
+                const announcementsRes = await fetch('/announcements/');
+                const announcements = announcementsRes.ok ? await announcementsRes.json() : [];
+
+                const list = document.getElementById('announcementList');
+                if (!announcements.length) {
+                    list.innerHTML = '<p class="text-gray-500">No announcements available.</p>';
+                } else {
+                    list.innerHTML = announcements.slice(0, 5).map(item => `
+                        <div class="rounded-xl border border-slate-200 p-4 bg-lightbg">
+                            <h4 class="font-semibold text-primary">${item.title}</h4>
+                            <p class="text-sm mt-1">${item.content}</p>
+                        </div>
+                    `).join('');
+                }
+
+                await loadStudents();
+                await loadAnnouncements();
+                await loadUsers();
+                await loadScores();
+            } catch (error) {
+                console.log('Error in loadAdminDashboard:', error);
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            }
+        }
+
+        loadAdminDashboard();
+    </script>
+</body>
+</html>

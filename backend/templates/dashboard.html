@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting Dashboard - Bright Brains Christian Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E2A38',
+                        secondary: '#2F80C0',
+                        accent: '#C0392B',
+                        gold: '#D4AF37',
+                        bgLight: '#F8FAFC',
+                        card: '#FFFFFF',
+                        border: '#E5E7EB',
+                        textPrimary: '#111827',
+                        textSecondary: '#6B7280',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-bgLight">
+    <div class="relative w-full max-w-xl mx-4 overflow-hidden rounded-3xl shadow-2xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-gold opacity-95"></div>
+        <div class="relative p-10 text-center text-white">
+            <h1 class="text-3xl font-bold mb-3">Preparing your dashboard</h1>
+            <p class="text-white/90 mb-6">We’re identifying your role and loading the right workspace.</p>
+            <div class="w-14 h-14 mx-auto rounded-full border-4 border-white/30 border-t-white animate-spin"></div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login';
+        }
+
+        fetch('/users/me', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Unauthorized');
+            return response.json();
+        })
+        .then(user => {
+            if (user.role === 'admin') {
+                window.location.href = '/dashboard/admin';
+            } else {
+                window.location.href = '/dashboard/student';
+            }
+        })
+        .catch(() => {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        });
+    </script>
+</body>
+</html>

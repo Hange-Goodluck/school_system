@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Bright Brains Christian Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E2A38',
+                        secondary: '#2F80C0',
+                        accent: '#C0392B',
+                        gold: '#D4AF37',
+                        bgLight: '#F8FAFC',
+                        card: '#FFFFFF',
+                        border: '#E5E7EB',
+                        textPrimary: '#111827',
+                        textSecondary: '#6B7280',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-bgLight text-textPrimary min-h-screen">
+    <header class="relative overflow-hidden shadow-xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-gold opacity-95"></div>
+        <div class="relative container mx-auto px-6 py-5 flex items-center justify-between text-white">
+            <div>
+                <p class="text-sm uppercase tracking-[0.3em] text-white/80">Student Portal</p>
+                <h1 class="text-2xl md:text-3xl font-bold">Welcome back, scholar</h1>
+            </div>
+            <button id="logoutBtn" class="px-4 py-2 rounded-lg bg-white/15 border border-white/30 hover:bg-white/25 transition">Logout</button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-secondary">
+                <p class="text-sm text-gray-500">Current Grade</p>
+                <h2 class="text-3xl font-bold text-primary mt-2" id="studentGrade">--</h2>
+                <p class="mt-2 text-gray-600">Academic placement for this term</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-gold">
+                <p class="text-sm text-gray-500">Student ID</p>
+                <h2 class="text-3xl font-bold text-primary mt-2" id="studentId">--</h2>
+                <p class="mt-2 text-gray-600">Official learner identification</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-t-4 border-accent">
+                <p class="text-sm text-gray-500">Status</p>
+                <h2 class="text-3xl font-bold text-primary mt-2">Active</h2>
+                <p class="mt-2 text-gray-600">You are enrolled and in good standing</p>
+            </div>
+        </section>
+
+        <section class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-primary">My Overview</h3>
+                    <span class="px-3 py-1 text-sm rounded-full bg-secondary/10 text-secondary">2026 Term</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Full Name</p>
+                        <p class="font-semibold text-primary mt-1" id="studentName">Loading...</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Email</p>
+                        <p class="font-semibold text-primary mt-1" id="studentEmail">Loading...</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Role</p>
+                        <p class="font-semibold text-primary mt-1">Student</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-lightbg">
+                        <p class="text-gray-500">Attendance</p>
+                        <p class="font-semibold text-primary mt-1">96%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4">Quick Actions</h3>
+                <div class="space-y-3">
+                    <button id="viewProfileBtn" class="w-full text-left px-4 py-3 rounded-xl bg-secondary text-white hover:bg-blue-700 transition">View Profile</button>
+                    <button id="checkAnnouncementsBtn" class="w-full text-left px-4 py-3 rounded-xl bg-primary text-white hover:opacity-90 transition">Check Announcements</button>
+                    <button class="w-full text-left px-4 py-3 rounded-xl bg-gold text-primary font-semibold hover:bg-yellow-400 transition opacity-50 cursor-not-allowed" disabled>Download Results</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-8 bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-semibold text-primary mb-4">Latest School Announcements</h3>
+            <div id="announcements" class="space-y-3 text-gray-700">
+                <p class="text-gray-500">Loading announcements...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6">
+                <h3 class="text-xl font-semibold text-primary mb-4">My Profile</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <p class="mt-1 text-lg font-semibold text-primary" id="modalStudentName">Loading...</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <p class="mt-1 text-lg font-semibold text-primary" id="modalStudentEmail">Loading...</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Student ID</label>
+                        <p class="mt-1 text-lg font-semibold text-primary" id="modalStudentId">Loading...</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Grade Level</label>
+                        <p class="mt-1 text-lg font-semibold text-primary" id="modalStudentGrade">Loading...</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <p class="mt-1 text-lg font-semibold text-primary" id="modalStudentDOB">Loading...</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Enrollment Date</label>
+                        <p class="mt-1 text-lg font-semibold text-primary" id="modalStudentEnrollment">Loading...</p>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button id="closeProfileBtn" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+
+        const profileModal = document.getElementById('profileModal');
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        });
+
+        document.getElementById('viewProfileBtn').addEventListener('click', () => {
+            loadProfileModal();
+            profileModal.classList.remove('hidden');
+        });
+
+        document.getElementById('closeProfileBtn').addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+        });
+
+        document.getElementById('checkAnnouncementsBtn').addEventListener('click', () => {
+            document.getElementById('announcements').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        async function loadStudentDashboard() {
+            try {
+                const userRes = await fetch('/users/me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!userRes.ok) throw new Error('Unauthorized');
+                const user = await userRes.json();
+
+                if (user.role === 'admin') {
+                    window.location.href = '/dashboard/admin';
+                    return;
+                }
+
+                document.getElementById('studentName').textContent = user.full_name;
+                document.getElementById('studentEmail').textContent = user.email;
+
+                const profileRes = await fetch('/students/me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                let profile = null;
+                if (profileRes.ok) {
+                    profile = await profileRes.json();
+                    document.getElementById('studentGrade').textContent = profile.grade_level;
+                    document.getElementById('studentId').textContent = profile.student_id;
+                }
+
+                // Store profile for modal
+                window.studentProfile = profile;
+                window.studentUser = user;
+
+                const announcementsRes = await fetch('/announcements/');
+                const announcements = announcementsRes.ok ? await announcementsRes.json() : [];
+                const container = document.getElementById('announcements');
+
+                if (!announcements.length) {
+                    container.innerHTML = '<p class="text-gray-500">No announcements yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = announcements.slice(0, 4).map(item => `
+                    <div class="rounded-xl border border-slate-200 p-4 bg-lightbg">
+                        <h4 class="font-semibold text-primary">${item.title}</h4>
+                        <p class="text-sm mt-1">${item.content}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            }
+        }
+
+        async function loadProfileModal() {
+            if (!window.studentUser || !window.studentProfile) return;
+
+            document.getElementById('modalStudentName').textContent = window.studentUser.full_name;
+            document.getElementById('modalStudentEmail').textContent = window.studentUser.email;
+            document.getElementById('modalStudentId').textContent = window.studentProfile.student_id;
+            document.getElementById('modalStudentGrade').textContent = window.studentProfile.grade_level;
+            document.getElementById('modalStudentDOB').textContent = new Date(window.studentProfile.date_of_birth).toLocaleDateString();
+            document.getElementById('modalStudentEnrollment').textContent = window.studentProfile.enrollment_date ? new Date(window.studentProfile.enrollment_date).toLocaleDateString() : 'Not set';
+        }
+
+        loadStudentDashboard();
+    </script>
+</body>
+</html>

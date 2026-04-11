@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bright Brains Christian Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Colors -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E2A38',
+            secondary: '#2F80C0',
+            accent: '#C0392B',
+            gold: '#D4AF37',
+            bgLight: '#F8FAFC',
+            card: '#FFFFFF',
+            border: '#E5E7EB',
+            textPrimary: '#111827',
+            textSecondary: '#6B7280',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgLight text-textPrimary">
+
+  <!-- Navbar -->
+  <header class="bg-primary text-white fixed w-full shadow-lg z-50">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      
+      <!-- Logo Placeholder -->
+      <div class="flex items-center space-x-3">
+        <img src="logo.png" alt="Bright Brains Christian Academy Logo" 
+             class="w-12 h-12 object-contain bg-white rounded-full p-1">
+        <h1 class="text-xl md:text-2xl font-bold">Bright Brains Christian Academy</h1>
+      </div>
+
+      <nav class="space-x-6 hidden md:flex items-center">
+        <a href="#about" class="hover:text-gold transition">About</a>
+        <a href="#academics" class="hover:text-gold transition">Academics</a>
+        <a href="#admissions" class="hover:text-gold transition">Admissions</a>
+        <a href="#contact" class="hover:text-gold transition">Contact</a>
+        <a href="/login" class="ml-6 inline-flex items-center px-4 py-2 border border-white/40 text-sm font-semibold rounded-lg bg-white/15 hover:bg-white/25 transition">
+          Login
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden pt-32 pb-24">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-gold opacity-90"></div>
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1596495577886-d920f33f78c9?auto=format&fit=crop&w=1400&q=80')] bg-cover bg-center opacity-40"></div>
+    <div class="relative container mx-auto text-center px-6 z-10">
+      <div class="flex justify-center mb-6">
+        <div class="w-28 h-28 rounded-full bg-white/20 backdrop-blur-md border border-white/30 shadow-2xl flex items-center justify-center">
+          <img src="logo.png" alt="School Logo" class="w-20 h-20 object-contain rounded-full">
+        </div>
+      </div>
+
+      <h2 class="text-4xl md:text-5xl font-bold mb-6 tracking-wide drop-shadow-lg"> 
+        Nurturing Minds. Building Character. Inspiring Faith.
+      </h2>
+      <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto leading-relaxed opacity-95">
+        Providing quality Christian education that empowers students to excel academically and grow spiritually,
+        in a secure environment with an innovative student-first approach.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="#admissions" class="px-10 py-3 rounded-full font-semibold bg-gold text-primary shadow-lg hover:shadow-2xl hover:scale-105 transform transition">
+          Enroll Now
+        </a>
+        <a href="/login" class="px-10 py-3 rounded-full font-semibold border border-white/40 text-white hover:bg-white/20 transition">
+          Student Login
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-white/90">Join the academic family loved by parents and trusted by educators since 2008.</p>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-16 bg-white">
+    <div class="container mx-auto px-6 md:flex items-center gap-12">
+      <div class="md:w-1/2 mb-8 md:mb-0 rounded-lg overflow-hidden shadow-lg">
+        <img src="https://images.unsplash.com/photo-1588072432836-e10032774350"
+             alt="Students learning"
+             class="rounded-lg shadow-lg">
+      </div>
+      <div class="md:w-1/2">
+        <h3 class="text-3xl font-bold text-textPrimary mb-4 border-b-4 border-gold inline-block pb-2">
+          About Our School
+        </h3>
+        <p class="mb-4 text-textSecondary">
+          Bright Brains Christian Academy is dedicated to academic excellence and spiritual growth.
+          We provide a safe, nurturing environment where students develop critical thinking skills,
+          strong moral values, and a lifelong love for learning.
+        </p>
+        <p class="text-textSecondary">
+          Our experienced educators integrate faith-based principles with modern teaching methods
+          to prepare students for success in school and in life.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Academics Section -->
+  <section id="academics" class="py-16 bg-bgLight">
+    <div class="container mx-auto px-6 text-center">
+      <h3 class="text-3xl font-bold text-textPrimary mb-12">Our Academic Programs</h3>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-card p-6 rounded-xl shadow-md hover:shadow-xl transition border-t-4 border-secondary border-l border-r border-b border-border">
+          <h4 class="text-xl font-semibold mb-4 text-secondary">Elementary School</h4>
+          <p class="text-textSecondary">Building strong foundations in literacy, numeracy, and Christian values.</p>
+        </div>
+
+        <div class="bg-card p-6 rounded-xl shadow-md hover:shadow-xl transition border-t-4 border-accent border-l border-r border-b border-border">
+          <h4 class="text-xl font-semibold mb-4 text-accent">Middle School</h4>
+          <p class="text-textSecondary">Encouraging curiosity, leadership, and academic excellence.</p>
+        </div>
+
+        <div class="bg-card p-6 rounded-xl shadow-md hover:shadow-xl transition border-t-4 border-gold border-l border-r border-b border-border">
+          <h4 class="text-xl font-semibold mb-4 text-textPrimary">High School</h4>
+          <p class="text-textSecondary">Preparing students for college, careers, and a life rooted in faith.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admissions -->
+  <section id="admissions" class="py-16 bg-primary text-white text-center">
+    <div class="container mx-auto px-6">
+      <h3 class="text-3xl font-bold mb-6 text-white">Admissions Open</h3>
+      <p class="mb-8 text-lg text-white/90">
+        Join our vibrant learning community today. Applications are now being accepted.
+      </p>
+      <a href="#contact"
+         class="bg-gold text-primary px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">
+        Apply Today
+      </a>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-16 bg-card">
+    <div class="container mx-auto px-6">
+      <h3 class="text-3xl font-bold text-textPrimary text-center mb-12">Contact Us</h3>
+
+      <div class="max-w-2xl mx-auto bg-bgLight p-8 rounded-xl shadow-md border border-border">
+        <form>
+          <div class="mb-4">
+            <label class="block mb-2 font-semibold text-textPrimary">Full Name</label>
+            <input type="text" class="w-full border border-border rounded-lg p-3 focus:ring-2 focus:ring-secondary" placeholder="Your full name">  
+          </div>
+
+          <div class="mb-4">
+            <label class="block mb-2 font-semibold text-textPrimary">Email Address</label>
+            <input type="email" class="w-full border border-border rounded-lg p-3 focus:ring-2 focus:ring-secondary" placeholder="your@email.com">
+          </div>
+
+          <div class="mb-4">
+            <label class="block mb-2 font-semibold text-textPrimary">Message</label>
+            <textarea rows="4" class="w-full border border-border rounded-lg p-3 focus:ring-2 focus:ring-secondary" placeholder="Your message here..."></textarea>
+          </div>
+
+          <button type="submit"
+                  class="w-full bg-accent text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-primary text-white py-6 text-center">
+    <p>&copy; 2026 Bright Brains Christian Academy. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>
