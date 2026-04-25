@@ -5,13 +5,15 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 from backend.core.config import settings
 from backend.db.database import engine
-from backend.models import User, Announcement
+from backend.models import User, Announcement, Student, StudentSubject
 from backend.models.enums import UserRole
 from backend.api import auth
 from backend.api.public import router as public_router
 from backend.api.students import router as students_router
 from backend.api.announcements import router as announcements_router
 from backend.api.admin import router as admin_router
+from typing import Optional
+from datetime import date
 
 app = FastAPI(
     title="School Management System",
@@ -79,9 +81,62 @@ def admin_dashboard(request: Request):
         },
     )
 
+def build_student_register_data(grade_level: Optional[str] = None):
+    with Session(engine) as session:
+        if grade_level:
+            students = session.exec(
+                select(Student).where(Student.grade_level == grade_level)
+            ).all()
+        else:
+            students = session.exec(select(Student)).all()
+
+        students_by_class = {}
+        for student in students:
+            grade = student.grade_level or "Unknown"
+            if grade not in students_by_class:
+                students_by_class[grade] = []
+
+            today = date.today()
+            age = today.year - student.date_of_birth.year - (
+                (today.month, today.day) < (student.date_of_birth.month, student.date_of_birth.day)
+            )
+
+            student_subjects = session.exec(
+                select(StudentSubject).where(StudentSubject.student_id == student.id)
+            ).all()
+            subject_names = [ss.subject for ss in student_subjects]
+
+            students_by_class[grade].append({
+                "id": student.id,
+                "student_id": student.student_id,
+                "student_name": student.user.full_name if student.user else f"Student {student.id}",
+                "email": student.user.email if student.user else "N/A",
+                "grade_level": grade,
+                "date_of_birth": student.date_of_birth,
+                "age": age,
+                "enrollment_date": student.enrollment_date,
+                "subjects": subject_names,
+                "subject_count": len(subject_names),
+            })
+
+        all_classes = session.exec(select(Student.grade_level).distinct()).all()
+        available_classes = sorted(list({c for c in all_classes if c}))
+
+    return students_by_class, available_classes, len(students)
+
 @app.get("/student-register")
-def student_register_page(request: Request):
-    return templates.TemplateResponse("student_register.html", {"request": request})
+def student_register_page(request: Request, grade_level: Optional[str] = None):
+    students_by_class, available_classes, total_students = build_student_register_data(grade_level)
+    return templates.TemplateResponse(
+        "student_register.html",
+        {
+            "request": request,
+            "students_by_class": students_by_class,
+            "available_classes": available_classes,
+            "total_students": total_students,
+            "selected_class": grade_level,
+        },
+    )
 
 @app.get("/attendance")
 def attendance_page(request: Request):
